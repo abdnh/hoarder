@@ -32,7 +32,7 @@ def take_screenshot() -> str:
 
 def trigger_copy() -> None:
     # Wait for the hotkey that triggered us to finish
-    time.sleep(1)
+    time.sleep(0.5)
     pyautogui.hotkey("ctrl", "c")
 
 
