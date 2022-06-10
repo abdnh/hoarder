@@ -11,7 +11,7 @@ def invoke(action, **params):
     requestJson = json.dumps(request(action, **params)).encode("utf-8")
     response = json.load(
         urllib.request.urlopen(
-            urllib.request.Request("http://localhost:8765", requestJson)
+            urllib.request.Request("http://127.0.0.1:8765", requestJson)
         )
     )
     if len(response) != 2:
