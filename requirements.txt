@@ -1,0 +1,7 @@
+PyQt5==5.15.6
+mss>=6,<7
+pyqtkeybind>=0.0.9,<1
+PyAutoGUI>=0.9.53<1
+pyperclip>=1<2
+jaraco.clipboard>=3<4
+black>=22<23
