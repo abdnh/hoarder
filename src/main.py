@@ -65,7 +65,14 @@ def ankihotkey_callback(context: AnkiHotkey):
     )
     msg = f"Copied:\n{truncate_text(strip_html(contents))}"
     # tooltip.show(msg, window, period=3000)
-    tray_icon.showMessage("Hoarder", msg)
+    tray_icon.showMessage("Hoarder", msg, QSystemTrayIcon.MessageIcon.Information)
+
+
+def ankihotkey_callback_wrapper(context: AnkiHotkey) -> None:
+    try:
+        ankihotkey_callback(context)
+    except Exception as exc:
+        tray_icon.showMessage("Hoarder", str(exc), QSystemTrayIcon.MessageIcon.Critical)
 
 
 def register_keys() -> List[AnkiHotkey]:
@@ -73,7 +80,9 @@ def register_keys() -> List[AnkiHotkey]:
     win_id = window.winId()
     for context in anki_hotkeys:
         keybinder.register_hotkey(
-            win_id, context.hotkey, lambda context=context: ankihotkey_callback(context)
+            win_id,
+            context.hotkey,
+            lambda context=context: ankihotkey_callback_wrapper(context),
         )
     return anki_hotkeys
 
