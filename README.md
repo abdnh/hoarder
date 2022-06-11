@@ -4,7 +4,7 @@ A virtual manager for your digital hoarding needs.
 It's a program that lets you define hotkeys to copy contents from different sources
 and send them to other sources. You can think of it as a simple specialized clipboard manager.
 The only thing the program lets you do for now is to define hotkeys to trigger Ctrl-C on selected text
-and save the text as [Anki](https://apps.ankiweb.net/) flashcards. Mainly useful for sentence mining.
+and save the text as [Anki](https://apps.ankiweb.net/) flashcards - mainly useful for sentence mining.
 
 ## Introduction
 
@@ -59,7 +59,7 @@ pip install -r requirements.txt
 python src/main.py
 ```
 
-There is no graphical interface yet, except for a system tray icon that lets you quit the program (You can also use `Ctrl+Alt+Q`).
+There is no graphical interface yet, except for a system tray icon that shows notifications and lets you quit the program (You can also use `Ctrl+Alt+Q`).
 
 Now, press some hotkey you defined in the config file and you should see a notification pops up telling you that the selected text was copied. Go to Anki and check the created note.
 
