@@ -71,3 +71,7 @@ def store_media(path: str) -> Any:
         path=path,
         deleteExisting=False,
     )
+
+
+def gui_browse(query: str) -> None:
+    invoke("guiBrowse", query=query)
