@@ -5,3 +5,6 @@ PyAutoGUI>=0.9.53<1
 pyperclip>=1<2
 jaraco.clipboard>=3<4
 black>=22<23
+isort>=5,<6
+pylint>=2,<3
+mypy>=0.960,<1

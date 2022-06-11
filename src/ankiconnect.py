@@ -1,17 +1,18 @@
-import os
 import json
+import os
 import urllib.request
+from typing import Any, Dict
 
 
-def request(action, **params):
+def request(action: str, **params: Any) -> Dict:
     return {"action": action, "params": params, "version": 6}
 
 
-def invoke(action, **params):
-    requestJson = json.dumps(request(action, **params)).encode("utf-8")
+def invoke(action: str, **params: Any) -> Any:
+    request_json = json.dumps(request(action, **params)).encode("utf-8")
     response = json.load(
         urllib.request.urlopen(
-            urllib.request.Request("http://127.0.0.1:8765", requestJson)
+            urllib.request.Request("http://127.0.0.1:8765", request_json)
         )
     )
     if len(response) != 2:
@@ -63,8 +64,8 @@ def add_note(
     return invoke("addNote", note=note)
 
 
-def store_media(path: str):
-    invoke(
+def store_media(path: str) -> Any:
+    return invoke(
         "storeMediaFile",
         filename=path,
         path=path,

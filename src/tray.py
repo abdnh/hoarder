@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 
 class TrayIcon(QSystemTrayIcon):
@@ -13,7 +13,7 @@ class TrayIcon(QSystemTrayIcon):
         super().__init__(icon, window)
         self.setup_ui()
 
-    def setup_ui(self):
+    def setup_ui(self) -> None:
         menu = QMenu(self.window)
         quit_action = QAction("Quit", self.window)
         quit_action.triggered.connect(lambda: self.app.quit())

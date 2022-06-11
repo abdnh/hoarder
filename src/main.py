@@ -1,18 +1,25 @@
 import html
 import os
-from pathlib import Path
 import re
 import sys
 import time
-from typing import List
+from pathlib import Path
+from typing import Any, List, Tuple, Union
 
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import QAbstractNativeEventFilter, QAbstractEventDispatcher
-from pyqtkeybind import keybinder
-from mss import mss
 import pyautogui
 from jaraco import clipboard
+from mss import mss
+
+# pylint: disable=no-member
+# pylint: disable=invalid-name
+from PyQt5.QtCore import (
+    QAbstractEventDispatcher,
+    QAbstractNativeEventFilter,
+    QByteArray,
+)
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+from pyqtkeybind import keybinder
 
 from ankiconnect import add_note, store_media
 from config import AnkiHotkey, read_config
@@ -49,7 +56,7 @@ def strip_html(text: str) -> str:
     return html.unescape(HTML_RE.sub("", text))
 
 
-def ankihotkey_callback(context: AnkiHotkey):
+def ankihotkey_callback(context: AnkiHotkey) -> None:
     trigger_copy()
     screenshot_filename = take_screenshot()
     screenshot_path = os.path.abspath(screenshot_filename)
@@ -76,15 +83,15 @@ def ankihotkey_callback_wrapper(context: AnkiHotkey) -> None:
 
 
 def register_keys() -> List[AnkiHotkey]:
-    anki_hotkeys = read_config()
+    contexts = read_config()
     win_id = window.winId()
-    for context in anki_hotkeys:
+    for context in contexts:
         keybinder.register_hotkey(
             win_id,
             context.hotkey,
             lambda context=context: ankihotkey_callback_wrapper(context),
         )
-    return anki_hotkeys
+    return contexts
 
 
 def unregister_keys(anki_hotkeys: List[AnkiHotkey]) -> None:
@@ -94,11 +101,13 @@ def unregister_keys(anki_hotkeys: List[AnkiHotkey]) -> None:
 
 
 class WinEventFilter(QAbstractNativeEventFilter):
-    def __init__(self, keybinder):
+    def __init__(self, keybinder: Any):
         self.keybinder = keybinder
         super().__init__()
 
-    def nativeEventFilter(self, eventType, message):
+    def nativeEventFilter(
+        self, eventType: Union[QByteArray, bytes, bytearray], message: Any
+    ) -> Tuple[bool, int]:
         ret = self.keybinder.handler(eventType, message)
         return ret, 0
 
