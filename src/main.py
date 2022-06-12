@@ -69,7 +69,10 @@ def ankihotkey_callback(context: AnkiHotkey) -> None:
     screenshot_filename = take_screenshot()
     screenshot_path = os.path.abspath(screenshot_filename)
     store_media(screenshot_path)
-    contents = clipboard.paste_html()
+    try:
+        contents = clipboard.paste_html()
+    except:
+        contents = clipboard.paste_text()
     global current_nid
     current_nid = add_note(
         context.notetype,
