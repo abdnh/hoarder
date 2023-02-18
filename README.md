@@ -33,20 +33,20 @@ An example config file is the following:
 
 ```json
 [
-  {
-    "hotkey": "Ctrl+Alt+O",
-    "notetype": "English Vocabulary",
-    "deck": "en::vocab",
-    "target_field": "Word",
-    "screenshot_field": "References"
-  },
-  {
-    "hotkey": "Ctrl+Alt+J",
-    "notetype": "Japanese Mined Sentence",
-    "deck": "ja::mined sentences",
-    "target_field": "Sentence",
-    "screenshot_field": "Image"
-  }
+    {
+        "hotkey": "Ctrl+Alt+O",
+        "notetype": "English Vocabulary",
+        "deck": "en::vocab",
+        "target_field": "Word",
+        "screenshot_field": "References"
+    },
+    {
+        "hotkey": "Ctrl+Alt+J",
+        "notetype": "Japanese Mined Sentence",
+        "deck": "ja::mined sentences",
+        "target_field": "Sentence",
+        "screenshot_field": "Image"
+    }
 ]
 ```
 
@@ -63,25 +63,33 @@ There is no graphical interface yet, except for a system tray icon that shows no
 
 Now, press some hotkey you defined in the config file and you should see a notification pops up telling you that the selected text was copied. Go to Anki and check the created note.
 
+## Screenshots
+
+Screenshots are saved as PNG both to your Anki media folder and to the `shots` directory in the current working directory. I may add an option to disable saving to the shots directory in the future. If you have thousands of screenshots and don't want/care about syncing them to AnkiWeb and seeing them in other devices, check my [Media Redirector](https://github.com/abdnh/anki-media-redirector) add-on.
+
+## Caching
+
+When Anki/AnkiConnect is not running, clippings are saved to the `src/cache.json` file then added to Anki in the first subsequent successful connection to AnkiConnect.
+
 ## Credit
 
 Libraries & tools used:
 
-- [PyQt5](https://pypi.org/project/PyQt5/) for the GUI.
-- [pyqtkeybind](https://pypi.org/project/pyqtkeybind/) for registering global hotkeys.
-- [mss](https://pypi.org/project/mss/) for taking screenshots.
-- [jaraco](https://pypi.org/project/jaraco.clipboard/) for getting text from the clipboard in HTML format.
-- [PyAutoGUI](https://pypi.org/project/PyAutoGUI/) for triggering Ctrl-C.
-- [AnkiConnect](https://ankiweb.net/shared/info/2055492159) for creating Anki cards.
-- The tray icon is adapted from [Clipboard minus](https://icons.getbootstrap.com/icons/clipboard-minus/) from Bootstrap icons.
+-   [PyQt5](https://pypi.org/project/PyQt5/) for the GUI.
+-   [pyqtkeybind](https://pypi.org/project/pyqtkeybind/) for registering global hotkeys.
+-   [mss](https://pypi.org/project/mss/) for taking screenshots.
+-   [jaraco](https://pypi.org/project/jaraco.clipboard/) for getting text from the clipboard in HTML format.
+-   [PyAutoGUI](https://pypi.org/project/PyAutoGUI/) for triggering Ctrl-C.
+-   [AnkiConnect](https://ankiweb.net/shared/info/2055492159) for creating Anki cards.
+-   The tray icon is adapted from [Clipboard minus](https://icons.getbootstrap.com/icons/clipboard-minus/) from Bootstrap icons.
 
 ## TODO
 
-- [ ] Provide prebuilt binaries.
-- [ ] Save the source of clipped text (e.g. title of window, link of web page, etc.)
-- [ ] Add option to save contents in some file in some format instead of sending them directly to Anki and other soruces. Also provide another option to sync with those sources when needed.
-- [ ] A graphical interface.
-- [ ] lots and lots of bug fixes.
+-   [ ] Provide prebuilt binaries.
+-   [ ] Save the source of clipped text (e.g. title of window, link of web page, etc.)
+-   [ ] Add option to save contents in some file in some format instead of sending them directly to Anki and other soruces. Also provide another option to sync with those sources when needed.
+-   [ ] A graphical interface.
+-   [ ] lots and lots of bug fixes.
 
 ## History
 
