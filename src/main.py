@@ -21,7 +21,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from pyqtkeybind import keybinder
 
-from ankiconnect import add_note, gui_browse, store_media
+import cache
+from ankiconnect import AnkiConnectionFailed, add_note, gui_browse, store_media
 from config import AnkiHotkey, read_config
 
 # from tooltip import Tooltip
@@ -29,7 +30,7 @@ from tray import TrayIcon
 
 sct = mss()
 
-SHOTS_DIR = Path("./shots")
+SHOTS_DIR = Path("./shots").resolve()
 
 
 def take_screenshot() -> str:
@@ -66,22 +67,41 @@ def on_tray_message_clicked() -> None:
 
 def ankihotkey_callback(context: AnkiHotkey) -> None:
     trigger_copy()
-    screenshot_filename = take_screenshot()
-    screenshot_path = os.path.abspath(screenshot_filename)
-    store_media(screenshot_path)
     try:
         contents = clipboard.paste_html()
     except:
         contents = clipboard.paste_text()
-    global current_nid
-    current_nid = add_note(
-        context.notetype,
-        context.deck,
-        context.target_field,
-        contents,
-        context.screenshot_field,
-        screenshot_path,
-    )
+    screenshot_path = os.path.abspath(take_screenshot())
+    screenshot_name = os.path.basename(screenshot_path)
+    try:
+        store_media(screenshot_path)
+        global current_nid
+        current_nid = add_note(
+            context.notetype,
+            context.deck,
+            context.target_field,
+            contents,
+            context.screenshot_field,
+            screenshot_path,
+        )
+    except AnkiConnectionFailed:
+        cache.add(context, contents, screenshot_name)
+        raise Exception("Failed to connect to AnkiConnect; entry cached")
+    else:
+        # Commit cached entries
+        for entry in cache.read():
+            entry_screenshot_path = str(SHOTS_DIR / entry.screenshot_name)
+            store_media(entry_screenshot_path)
+            entry_hotkey_context = entry.hotkey_context
+            add_note(
+                entry_hotkey_context.notetype,
+                entry_hotkey_context.deck,
+                entry_hotkey_context.target_field,
+                entry.text,
+                entry_hotkey_context.screenshot_field,
+                entry_screenshot_path,
+            )
+        cache.write([])
     msg = f"Copied:\n{truncate_text(strip_html(contents))}"
     # tooltip.show(msg, window, period=3000)
     tray_icon.showMessage("Hoarder", msg, QSystemTrayIcon.MessageIcon.Information)

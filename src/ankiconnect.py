@@ -2,6 +2,15 @@ import json
 import os
 import urllib.request
 from typing import Any, Dict
+from urllib.error import URLError
+
+
+class AnkiConnectException(Exception):
+    pass
+
+
+class AnkiConnectionFailed(AnkiConnectException):
+    pass
 
 
 def request(action: str, **params: Any) -> Dict:
@@ -10,11 +19,14 @@ def request(action: str, **params: Any) -> Dict:
 
 def invoke(action: str, **params: Any) -> Any:
     request_json = json.dumps(request(action, **params)).encode("utf-8")
-    response = json.load(
-        urllib.request.urlopen(
-            urllib.request.Request("http://127.0.0.1:8765", request_json)
+    try:
+        response = json.load(
+            urllib.request.urlopen(
+                urllib.request.Request("http://127.0.0.1:8765", request_json)
+            )
         )
-    )
+    except URLError as exc:
+        raise AnkiConnectionFailed from exc
     if len(response) != 2:
         raise Exception("response has an unexpected number of fields")
     if "error" not in response:
