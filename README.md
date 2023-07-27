@@ -67,6 +67,8 @@ Now, press some hotkey you defined in the config file and you should see a notif
 
 Screenshots are saved as PNG both to your Anki media folder and to the `shots` directory in the current working directory. I may add an option to disable saving to the shots directory in the future. If you have thousands of screenshots and don't want/care about syncing them to AnkiWeb and seeing them in other devices, check my [Media Redirector](https://github.com/abdnh/anki-media-redirector) add-on.
 
+You can save the screenshots as WebP by installing the [Paste Images As WebP](https://ankiweb.net/shared/info/1151815987) add-on. By default, the add-on converts images added by AnkiConnect automatically in recent versions. Note that this makes note creation slower.
+
 ## Caching
 
 When Anki/AnkiConnect is not running, clippings are saved to the `src/cache.json` file then added to Anki in the first subsequent successful connection to AnkiConnect.
