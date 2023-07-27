@@ -76,14 +76,5 @@ def add_note(
     return invoke("addNote", note=note)
 
 
-def store_media(path: str) -> Any:
-    return invoke(
-        "storeMediaFile",
-        filename=path,
-        path=path,
-        deleteExisting=False,
-    )
-
-
 def gui_browse(query: str) -> None:
     invoke("guiBrowse", query=query)

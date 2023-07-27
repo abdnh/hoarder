@@ -22,7 +22,7 @@ from PyQt5.QtWidgets import *
 from pyqtkeybind import keybinder
 
 import cache
-from ankiconnect import AnkiConnectionFailed, add_note, gui_browse, store_media
+from ankiconnect import AnkiConnectionFailed, add_note, gui_browse
 from config import AnkiHotkey, read_config
 
 # from tooltip import Tooltip
@@ -74,7 +74,6 @@ def ankihotkey_callback(context: AnkiHotkey) -> None:
     screenshot_path = os.path.abspath(take_screenshot())
     screenshot_name = os.path.basename(screenshot_path)
     try:
-        store_media(screenshot_path)
         global current_nid
         current_nid = add_note(
             context.notetype,
@@ -91,7 +90,6 @@ def ankihotkey_callback(context: AnkiHotkey) -> None:
         # Commit cached entries
         for entry in cache.read():
             entry_screenshot_path = str(SHOTS_DIR / entry.screenshot_name)
-            store_media(entry_screenshot_path)
             entry_hotkey_context = entry.hotkey_context
             add_note(
                 entry_hotkey_context.notetype,
