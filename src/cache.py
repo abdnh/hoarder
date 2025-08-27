@@ -15,7 +15,7 @@ CACHE_PATH = Path(__file__).parent / Path("cache.json")
 class CacheEntry:
     hotkey_context: AnkiHotkey
     text: str
-    screenshot_name: str
+    screenshot_names: list[str]
 
 
 def read() -> list[CacheEntry]:
@@ -29,7 +29,7 @@ def read() -> list[CacheEntry]:
             CacheEntry(
                 hotkey_context=AnkiHotkey(**ent["hotkey_context"]),
                 text=ent["text"],
-                screenshot_name=ent["screenshot_name"],
+                screenshot_names=ent["screenshot_names"],
             )
         )
 
@@ -43,18 +43,18 @@ def write(entries: list[CacheEntry]) -> None:
             {
                 "hotkey_context": dataclasses.asdict(entry.hotkey_context),
                 "text": entry.text,
-                "screenshot_name": entry.screenshot_name,
+                "screenshot_names": entry.screenshot_names,
             }
         )
     with open(CACHE_PATH, "w", encoding="utf-8") as file:
         json.dump(data, file)
 
 
-def add(hotkey_context: AnkiHotkey, text: str, screenshot_name: str) -> None:
+def add(hotkey_context: AnkiHotkey, text: str, screenshot_names: list[str]) -> None:
     entries = read()
     entries.append(
         CacheEntry(
-            hotkey_context=hotkey_context, text=text, screenshot_name=screenshot_name
+            hotkey_context=hotkey_context, text=text, screenshot_names=screenshot_names
         )
     )
     write(entries)

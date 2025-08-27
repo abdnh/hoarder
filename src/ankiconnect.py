@@ -44,7 +44,7 @@ def add_note(
     field: str,
     contents: str,
     screenshot_field: str,
-    screenshot_filename: str,
+    screenshot_filenames: list[str],
     refs: str = "",
 ) -> int:
     note = {
@@ -69,7 +69,7 @@ def add_note(
                 "path": os.path.join(os.path.dirname(__file__), screenshot_filename),
                 "deleteExisting": False,
                 "fields": [screenshot_field],
-            }
+            } for screenshot_filename in screenshot_filenames
         ],
     }
 
