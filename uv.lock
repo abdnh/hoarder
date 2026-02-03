@@ -84,6 +84,7 @@ dependencies = [
 dev = [
     { name = "mypy" },
     { name = "ruff" },
+    { name = "types-keyboard" },
 ]
 
 [package.metadata]
@@ -100,6 +101,7 @@ requires-dist = [
 dev = [
     { name = "mypy", specifier = ">=1.19.1" },
     { name = "ruff", specifier = ">=0.15.0" },
+    { name = "types-keyboard", specifier = ">=0.13.2.20250801" },
 ]
 
 [[package]]
@@ -8161,6 +8163,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/36/bf/8825b5929afd84d0dabd606c67cd57b8388cb3ec385f7ef19c5cc2202069/typer-0.21.1.tar.gz", hash = "sha256:ea835607cd752343b6b2b7ce676893e5a0324082268b48f27aa058bdb7d2145d", size = 110371, upload-time = "2026-01-06T11:21:10.989Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a0/1d/d9257dd49ff2ca23ea5f132edf1281a0c4f9de8a762b9ae399b670a59235/typer-0.21.1-py3-none-any.whl", hash = "sha256:7985e89081c636b88d172c2ee0cfe33c253160994d47bdfdc302defd7d1f1d01", size = 47381, upload-time = "2026-01-06T11:21:09.824Z" },
+]
+
+[[package]]
+name = "types-keyboard"
+version = "0.13.2.20250801"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ee/ee/42fb593ff759a0222c984c75c33e175d277baff42e3d45c5a2896327d4bd/types_keyboard-0.13.2.20250801.tar.gz", hash = "sha256:af34b539ecb8b70bd247f403a27bf5c3e32f3cb1122b7f7ee505df37cdbd1f4a", size = 10822, upload-time = "2025-08-01T03:48:32.829Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ed/04/2e77f96aa51143712de3098bc0c5c9b15d608d57e61eec1c93983ea4cadf/types_keyboard-0.13.2.20250801-py3-none-any.whl", hash = "sha256:ef7f6fc8fdf6b0be412f7458ef743795a3652298d8b92004ef52527cab4e5d09", size = 11874, upload-time = "2025-08-01T03:48:32.05Z" },
 ]
 
 [[package]]

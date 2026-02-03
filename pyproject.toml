@@ -17,4 +17,5 @@ dependencies = [
 dev = [
     "mypy>=1.19.1",
     "ruff>=0.15.0",
+    "types-keyboard>=0.13.2.20250801",
 ]
