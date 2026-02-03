@@ -13,12 +13,12 @@ from jaraco import clipboard
 from mss import mss
 from PyQt6.QtWidgets import QApplication, QMainWindow, QSystemTrayIcon
 
-import cache
-from ankiconnect import AnkiConnectionFailed, add_note, gui_browse
-from config import AnkiHotkey, read_config
+from hoarder import cache
+from hoarder.ankiconnect import AnkiConnectionFailed, add_note, gui_browse
+from hoarder.config import AnkiHotkey, read_config
 
 # from tooltip import Tooltip
-from tray import TrayIcon
+from hoarder.tray import TrayIcon
 
 SHOTS_DIR = Path("./shots").resolve()
 
@@ -123,19 +123,20 @@ def unregister_keys(anki_hotkeys: list[AnkiHotkey]) -> None:
         keyboard.remove_hotkey(context.hotkey)
 
 
-app = QApplication(sys.argv)
-window = QMainWindow()
-window.setMinimumSize(600, 500)
+def main() -> None:
+    app = QApplication(sys.argv)
+    window = QMainWindow()
+    window.setMinimumSize(600, 500)
 
-tray_icon = TrayIcon(app, window)
-tray_icon.messageClicked.connect(on_tray_message_clicked)
-tray_icon.show()
+    tray_icon = TrayIcon(app, window)
+    tray_icon.messageClicked.connect(on_tray_message_clicked)
+    tray_icon.show()
 
 
-EXIT_KEY = "Ctrl+Alt+Q"
-keyboard.register_hotkey(EXIT_KEY, lambda: QApplication.exit(0))
-anki_hotkeys = register_keys()
+    EXIT_KEY = "Ctrl+Alt+Q"
+    keyboard.register_hotkey(EXIT_KEY, lambda: QApplication.exit(0))
+    anki_hotkeys = register_keys()
 
-app.exec()
-unregister_keys(anki_hotkeys)
-keyboard.remove_hotkey(EXIT_KEY)
+    app.exec()
+    unregister_keys(anki_hotkeys)
+    keyboard.remove_hotkey(EXIT_KEY)

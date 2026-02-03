@@ -6,7 +6,7 @@ import dataclasses
 import json
 from pathlib import Path
 
-from config import AnkiHotkey
+from hoarder.config import AnkiHotkey
 
 CACHE_PATH = Path(__file__).parent / Path("cache.json")
 

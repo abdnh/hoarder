@@ -1,0 +1,23 @@
+[
+    {
+        "hotkey": "Ctrl+Alt+O",
+        "notetype": "Mined Sentence",
+        "deck": "all::~next::en::09. mined sentences",
+        "target_field": "sentence",
+        "screenshot_field": "image"
+    },
+    {
+        "hotkey": "Ctrl+Alt+I",
+        "notetype": "Mined Turkish Sentence",
+        "deck": "all::~next::tr::07. mined sentences",
+        "target_field": "sentence",
+        "screenshot_field": "image"
+    },
+    {
+        "hotkey": "Ctrl+Alt+J",
+        "notetype": "Japanese mpvacious",
+        "deck": "all::~next::jp::04. mined sentences",
+        "target_field": "sentence",
+        "screenshot_field": "image"
+    }    
+]

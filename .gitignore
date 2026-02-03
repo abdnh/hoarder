@@ -1,7 +1,13 @@
-venv/
+*.egg-info/
+*.dist-info/
 __pycache__/
+.venv/
 TODO.md
 src/config.json
 src/cache.json
 shots/
 ankidata/
+.briefcase/
+build/
+dist/
+logs/

@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "hoarder"
 version = "0.1.0"
@@ -15,7 +19,22 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "briefcase>=0.3.24",
     "mypy>=1.19.1",
     "ruff>=0.15.0",
     "types-keyboard>=0.13.2.20250801",
+]
+
+[tool.briefcase]
+project_name = "Hoarder"
+bundle = "net.abdnh.hoarder"
+license.file = "LICENSE"
+author = "Abdo"
+author_email = "abdo@abdnh.net"
+
+[tool.briefcase.app.hoarder]
+formal_name = "Hoarder"
+description = "Helper for copying text to Anki"
+sources = [
+    "src/hoarder",
 ]
