@@ -1,25 +1,17 @@
+from __future__ import annotations
 import html
 import os
 import re
 import sys
 import time
 from pathlib import Path
-from typing import Any, List, Optional, Tuple, Union
 
 import pyautogui
 from jaraco import clipboard
 from mss import mss
 
-# pylint: disable=no-member
-# pylint: disable=invalid-name
-from PyQt5.QtCore import (
-    QAbstractEventDispatcher,
-    QAbstractNativeEventFilter,
-    QByteArray,
-)
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from pyqtkeybind import keybinder
+from PyQt6.QtWidgets import QSystemTrayIcon, QMainWindow, QApplication
+import keyboard
 
 import cache
 from ankiconnect import AnkiConnectionFailed, add_note, gui_browse
@@ -28,13 +20,13 @@ from config import AnkiHotkey, read_config
 # from tooltip import Tooltip
 from tray import TrayIcon
 
-sct = mss()
-
 SHOTS_DIR = Path("./shots").resolve()
 
 
 def take_screenshots() -> list[str]:
-    return list(sct.save(output=str(SHOTS_DIR / "{date:%Y-%m-%d %H-%M-%S}-{mon}.png")))
+    with mss() as sct:
+        return list(sct.save(output=str(SHOTS_DIR / "{date:%Y-%m-%d %H-%M-%S}-{mon}.png")))
+
 
 def trigger_copy() -> None:
     # Wait for the hotkey that triggered us to finish
@@ -55,7 +47,7 @@ def strip_html(text: str) -> str:
     return html.unescape(HTML_RE.sub("", text))
 
 
-current_nid: Optional[int] = None
+current_nid: int | None = None
 
 
 def on_tray_message_clicked() -> None:
@@ -87,7 +79,9 @@ def ankihotkey_callback(context: AnkiHotkey) -> None:
     else:
         # Commit cached entries
         for entry in cache.read():
-            entry_screenshot_paths = [str(SHOTS_DIR / name) for name in entry.screenshot_names]
+            entry_screenshot_paths = [
+                str(SHOTS_DIR / name) for name in entry.screenshot_names
+            ]
             entry_hotkey_context = entry.hotkey_context
             add_note(
                 entry_hotkey_context.notetype,
@@ -112,34 +106,19 @@ def ankihotkey_callback_wrapper(context: AnkiHotkey) -> None:
         tray_icon.showMessage("Hoarder", str(exc), QSystemTrayIcon.MessageIcon.Critical)
 
 
-def register_keys() -> List[AnkiHotkey]:
+def register_keys() -> list[AnkiHotkey]:
     contexts = read_config()
-    win_id = window.winId()
     for context in contexts:
-        keybinder.register_hotkey(
-            win_id,
+        keyboard.register_hotkey(
             context.hotkey,
             lambda context=context: ankihotkey_callback_wrapper(context),
         )
     return contexts
 
 
-def unregister_keys(anki_hotkeys: List[AnkiHotkey]) -> None:
-    win_id = window.winId()
+def unregister_keys(anki_hotkeys: list[AnkiHotkey]) -> None:
     for context in anki_hotkeys:
-        keybinder.unregister_hotkey(win_id, context.hotkey)
-
-
-class WinEventFilter(QAbstractNativeEventFilter):
-    def __init__(self, keybinder: Any):
-        self.keybinder = keybinder
-        super().__init__()
-
-    def nativeEventFilter(
-        self, eventType: Union[QByteArray, bytes, bytearray], message: Any
-    ) -> Tuple[bool, int]:
-        ret = self.keybinder.handler(eventType, message)
-        return ret, 0
+        keyboard.remove_hotkey(context.hotkey)
 
 
 app = QApplication(sys.argv)
@@ -149,18 +128,12 @@ window.setMinimumSize(600, 500)
 tray_icon = TrayIcon(app, window)
 tray_icon.messageClicked.connect(on_tray_message_clicked)
 tray_icon.show()
-keybinder.init()
-# tooltip = Tooltip()
+
 
 EXIT_KEY = "Ctrl+Alt+Q"
-keybinder.register_hotkey(window.winId(), EXIT_KEY, window.close)
+keyboard.register_hotkey(EXIT_KEY, lambda: QApplication.exit(0))
 anki_hotkeys = register_keys()
-
-win_event_filter = WinEventFilter(keybinder)
-event_dispatcher = QAbstractEventDispatcher.instance()
-event_dispatcher.installNativeEventFilter(win_event_filter)
 
 app.exec()
 unregister_keys(anki_hotkeys)
-keybinder.unregister_hotkey(window.winId(), EXIT_KEY)
-sct.close()
+keyboard.remove_hotkey(EXIT_KEY)

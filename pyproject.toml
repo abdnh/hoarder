@@ -1,0 +1,22 @@
+[project]
+name = "hoarder"
+version = "0.1.0"
+description = "Helper for copying text to Anki"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "jaraco-clipboard>=3.1.0",
+    "keyboard>=0.13.5",
+    "mss>=10.1.0",
+    "pyautogui>=0.9.54",
+    "pyperclip>=1.11.0",
+    "pyqt6>=6.10.2",
+]
+
+[dependency-groups]
+dev = [
+    "black>=25.11.0",
+    "isort>=6.1.0",
+    "mypy>=1.19.1",
+    "pylint>=3.3.9",
+]

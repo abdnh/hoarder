@@ -77,8 +77,8 @@ When Anki/AnkiConnect is not running, clippings are saved to the `src/cache.json
 
 Libraries & tools used:
 
--   [PyQt5](https://pypi.org/project/PyQt5/) for the GUI.
--   [pyqtkeybind](https://pypi.org/project/pyqtkeybind/) for registering global hotkeys.
+-   [PyQt6](https://pypi.org/project/PyQt6/) for the GUI.
+-   [keyboard](https://pypi.org/project/keyboard/) for registering global hotkeys.
 -   [mss](https://pypi.org/project/mss/) for taking screenshots.
 -   [jaraco](https://pypi.org/project/jaraco.clipboard/) for getting text from the clipboard in HTML format.
 -   [PyAutoGUI](https://pypi.org/project/PyAutoGUI/) for triggering Ctrl-C.
