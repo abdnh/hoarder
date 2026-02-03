@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import html
 import os
 import re
@@ -6,12 +7,11 @@ import sys
 import time
 from pathlib import Path
 
+import keyboard
 import pyautogui
 from jaraco import clipboard
 from mss import mss
-
-from PyQt6.QtWidgets import QSystemTrayIcon, QMainWindow, QApplication
-import keyboard
+from PyQt6.QtWidgets import QApplication, QMainWindow, QSystemTrayIcon
 
 import cache
 from ankiconnect import AnkiConnectionFailed, add_note, gui_browse
@@ -25,7 +25,9 @@ SHOTS_DIR = Path("./shots").resolve()
 
 def take_screenshots() -> list[str]:
     with mss() as sct:
-        return list(sct.save(output=str(SHOTS_DIR / "{date:%Y-%m-%d %H-%M-%S}-{mon}.png")))
+        return list(
+            sct.save(output=str(SHOTS_DIR / "{date:%Y-%m-%d %H-%M-%S}-{mon}.png"))
+        )
 
 
 def trigger_copy() -> None:
