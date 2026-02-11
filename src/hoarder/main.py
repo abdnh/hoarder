@@ -21,7 +21,7 @@ from hoarder.config import AnkiHotkey, read_config
 from hoarder.tray import TrayIcon
 
 SHOTS_DIR = Path("./shots").resolve()
-
+tray_icon: TrayIcon | None = None
 
 def take_screenshots() -> list[str]:
     with mss() as sct:
@@ -127,7 +127,7 @@ def main() -> None:
     app = QApplication(sys.argv)
     window = QMainWindow()
     window.setMinimumSize(600, 500)
-
+    global tray_icon
     tray_icon = TrayIcon(app, window)
     tray_icon.messageClicked.connect(on_tray_message_clicked)
     tray_icon.show()
