@@ -3,7 +3,7 @@
 __pycache__/
 .venv/
 TODO.md
-src/config.json
+config.json
 src/cache.json
 shots/
 ankidata/
