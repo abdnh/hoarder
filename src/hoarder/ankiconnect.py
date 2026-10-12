@@ -22,7 +22,12 @@ def invoke(action: str, **params: Any) -> Any:
     try:
         response = json.load(
             urllib.request.urlopen(
-                urllib.request.Request("http://127.0.0.1:8765", request_json)
+                urllib.request.Request(
+                    "http://127.0.0.1:8765",
+                    data=request_json,
+                    method="POST",
+                    headers={"Content-Type": "application/json"},
+                )
             )
         )
     except URLError as exc:
