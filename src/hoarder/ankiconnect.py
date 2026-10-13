@@ -70,8 +70,8 @@ def add_note(
         },
         "picture": [
             {
-                "filename": screenshot_filename,
-                "path": os.path.join(os.path.dirname(__file__), screenshot_filename),
+                "filename": os.path.basename(screenshot_filename),
+                "path": screenshot_filename,
                 "deleteExisting": False,
                 "fields": [screenshot_field],
             }
