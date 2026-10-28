@@ -10,7 +10,8 @@ readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
     "jaraco-clipboard>=3.1.0",
-    "keyboard>=0.13.5",
+    "jeepney>=0.9 ; sys_platform == 'linux'",
+    "keyboard>=0.13.5; sys_platform != 'linux'",
     "mss>=10.1.0",
     "pyautogui>=0.9.54",
     "pyperclip>=1.11.0",

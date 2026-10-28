@@ -7,7 +7,6 @@ import sys
 import time
 from pathlib import Path
 
-import keyboard
 import pyautogui
 from jaraco import clipboard
 from mss import mss
@@ -16,6 +15,7 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QSystemTrayIcon
 from hoarder import cache
 from hoarder.ankiconnect import AnkiConnectionFailed, add_note, gui_browse
 from hoarder.config import AnkiHotkey, read_config
+from hoarder.hotkeys import Hotkey, HotkeyBackend, create_backend
 
 # from tooltip import Tooltip
 from hoarder.tray import TrayIcon
@@ -108,19 +108,36 @@ def ankihotkey_callback_wrapper(context: AnkiHotkey) -> None:
         tray_icon.showMessage("Hoarder", str(exc), QSystemTrayIcon.MessageIcon.Critical)
 
 
-def register_keys() -> list[AnkiHotkey]:
+EXIT_KEY = "Ctrl+Alt+Q"
+EXIT_KEY_ID = "quit"
+
+
+def register_keys(backend: HotkeyBackend) -> None:
     contexts = read_config()
-    for context in contexts:
-        keyboard.register_hotkey(
+    # Use the trigger as the ID so changing it in the config registers a new shortcut
+    contexts_by_id = {context.hotkey: context for context in contexts}
+    hotkeys = [Hotkey(EXIT_KEY_ID, EXIT_KEY, "Quit Hoarder")] + [
+        Hotkey(
             context.hotkey,
-            lambda context=context: ankihotkey_callback_wrapper(context),
+            context.hotkey,
+            f"Add to {context.deck} ({context.notetype})",
         )
-    return contexts
+        for context in contexts
+    ]
 
+    def on_activated(id: str) -> None:
+        if id == EXIT_KEY_ID:
+            QApplication.exit(0)
+        elif context := contexts_by_id.get(id):
+            ankihotkey_callback_wrapper(context)
 
-def unregister_keys(anki_hotkeys: list[AnkiHotkey]) -> None:
-    for context in anki_hotkeys:
-        keyboard.remove_hotkey(context.hotkey)
+    backend.activated.connect(on_activated)
+    backend.failed.connect(
+        lambda msg: tray_icon.showMessage(
+            "Hoarder", msg, QSystemTrayIcon.MessageIcon.Critical
+        )
+    )
+    backend.start(hotkeys)
 
 
 def main() -> None:
@@ -133,10 +150,8 @@ def main() -> None:
     tray_icon.show()
 
 
-    EXIT_KEY = "Ctrl+Alt+Q"
-    keyboard.register_hotkey(EXIT_KEY, lambda: QApplication.exit(0))
-    anki_hotkeys = register_keys()
+    backend = create_backend()
+    register_keys(backend)
 
     app.exec()
-    unregister_keys(anki_hotkeys)
-    keyboard.remove_hotkey(EXIT_KEY)
+    backend.stop()
