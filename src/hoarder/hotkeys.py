@@ -1,15 +1,10 @@
 from __future__ import annotations
 
-import os
 import sys
 import threading
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Any
 
 from PyQt6.QtCore import QObject, pyqtSignal
-
-APP_ID = "net.abdnh.hoarder"
 
 
 @dataclass
@@ -94,35 +89,10 @@ def to_portal_trigger(trigger: str) -> str:
     return "+".join(parts)
 
 
-PORTAL_BUS_NAME = "org.freedesktop.portal.Desktop"
-PORTAL_PATH = "/org/freedesktop/portal/desktop"
-
-
-def ensure_desktop_file() -> None:
-    """Install a minimal desktop file if none exists; the portal refuses to register app IDs without one."""
-    data_home = Path(os.environ.get("XDG_DATA_HOME") or Path.home() / ".local/share")
-    data_dirs = os.environ.get("XDG_DATA_DIRS") or "/usr/local/share:/usr/share"
-    dirs = [data_home] + [Path(d) for d in data_dirs.split(":") if d]
-    if any((d / "applications" / f"{APP_ID}.desktop").exists() for d in dirs):
-        return
-    path = data_home / "applications" / f"{APP_ID}.desktop"
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        "[Desktop Entry]\n"
-        "Type=Application\n"
-        "Name=Hoarder\n"
-        "Comment=Helper for copying text to Anki\n"
-        f"Exec={sys.executable} -m hoarder\n"
-        "NoDisplay=true\n",
-        encoding="utf-8",
-    )
-
-
 class PortalHotkeyBackend(HotkeyBackend):
     """Uses the XDG desktop portal GlobalShortcuts interface (works on Wayland without root).
 
-    QtDBus can't marshal the `a(sa{sv})` argument of BindShortcuts from Python, so this
-    talks to the portal with jeepney on a worker thread instead.
+    Runs on a worker thread with its own portal connection, since the connection blocks.
     """
 
     def __init__(self) -> None:
@@ -148,75 +118,33 @@ class PortalHotkeyBackend(HotkeyBackend):
             self.failed.emit(f"Failed to register global shortcuts: {exc}")
 
     def _listen(self, hotkeys: list[Hotkey]) -> None:
-        from jeepney import DBusAddress, MatchRule, MessageType, new_method_call
-        from jeepney.bus_messages import message_bus
-        from jeepney.io.blocking import Proxy, open_dbus_connection
+        from jeepney import MatchRule
 
-        conn = open_dbus_connection(bus="SESSION")
-        bus = Proxy(message_bus, conn)
-        sender = conn.unique_name[1:].replace(".", "_")
-        portal = DBusAddress(PORTAL_PATH, PORTAL_BUS_NAME)
+        from hoarder import portal
 
-        def call(interface: str, method: str, signature: str, body: tuple) -> Any:
-            msg = new_method_call(
-                portal.with_interface(interface), method, signature, body
-            )
-            reply = conn.send_and_get_reply(msg)
-            if reply.header.message_type == MessageType.error:
-                raise RuntimeError(f"{method}: {reply.body[0] if reply.body else ''}")
-            return reply.body
-
-        def request(method: str, signature: str, body: tuple, token: str) -> dict:
-            # Subscribe to the Response before calling to avoid missing it
-            rule = MatchRule(
-                type="signal",
-                interface="org.freedesktop.portal.Request",
-                member="Response",
-                path=f"{PORTAL_PATH}/request/{sender}/{token}",
-            )
-            bus.AddMatch(rule)
-            with conn.filter(rule) as queue:
-                call("org.freedesktop.portal.GlobalShortcuts", method, signature, body)
-                response, results = conn.recv_until_filtered(queue).body
-            bus.RemoveMatch(rule)
-            if response != 0:
-                raise RuntimeError(f"{method} was cancelled or failed ({response})")
-            return results
-
-        # Lets the portal identify us when not running in a sandbox (xdg-desktop-portal >= 1.19)
-        ensure_desktop_file()
-        try:
-            call(
-                "org.freedesktop.host.portal.Registry",
-                "Register",
-                "sa{sv}",
-                (APP_ID, {}),
-            )
-        except RuntimeError:
-            pass
-
-        results = request(
+        interface = "org.freedesktop.portal.GlobalShortcuts"
+        conn = portal.PortalConnection()
+        token = conn.new_token()
+        results = conn.request(
+            interface,
             "CreateSession",
             "a{sv}",
             (
                 {
-                    "handle_token": ("s", "hoarder_session"),
-                    "session_handle_token": ("s", "hoarder"),
+                    "handle_token": ("s", token),
+                    "session_handle_token": ("s", conn.new_token()),
                 },
             ),
-            "hoarder_session",
+            token,
         )
         session = results["session_handle"][1]
 
         activated = MatchRule(
-            type="signal",
-            interface="org.freedesktop.portal.GlobalShortcuts",
-            member="Activated",
-            path=PORTAL_PATH,
+            type="signal", interface=interface, member="Activated", path=portal.PATH
         )
         activated.add_arg_condition(0, session)
-        bus.AddMatch(activated)
-        with conn.filter(activated) as queue:
+        conn.bus.AddMatch(activated)
+        with conn.conn.filter(activated) as queue:
             shortcuts = [
                 (
                     hotkey.id,
@@ -227,25 +155,22 @@ class PortalHotkeyBackend(HotkeyBackend):
                 )
                 for hotkey in hotkeys
             ]
-            request(
+            token = conn.new_token()
+            conn.request(
+                interface,
                 "BindShortcuts",
                 "oa(sa{sv})sa{sv}",
-                (session, shortcuts, "", {"handle_token": ("s", "hoarder_bind")}),
-                "hoarder_bind",
+                (session, shortcuts, "", {"handle_token": ("s", token)}),
+                token,
             )
             while not self._stopping.is_set():
                 try:
-                    msg = conn.recv_until_filtered(queue, timeout=0.5)
+                    msg = conn.conn.recv_until_filtered(queue, timeout=0.5)
                 except TimeoutError:
                     continue
                 self.activated.emit(msg.body[1])
 
-        conn.send(
-            new_method_call(
-                DBusAddress(session, PORTAL_BUS_NAME, "org.freedesktop.portal.Session"),
-                "Close",
-            )
-        )
+        conn.call("org.freedesktop.portal.Session", "Close", path=session)
         conn.close()
 
 

@@ -6,13 +6,13 @@ import re
 import sys
 from pathlib import Path
 
-from mss import mss
 from PyQt6.QtWidgets import QApplication, QMainWindow, QSystemTrayIcon
 
 from hoarder import cache
 from hoarder.ankiconnect import AnkiConnectionFailed, add_note, gui_browse
 from hoarder.config import AnkiHotkey, read_config
 from hoarder.hotkeys import Hotkey, HotkeyBackend, create_backend
+from hoarder.screenshot import take_screenshots
 from hoarder.selection import get_selected_text
 
 # from tooltip import Tooltip
@@ -20,13 +20,6 @@ from hoarder.tray import TrayIcon
 
 SHOTS_DIR = Path("./shots").resolve()
 tray_icon: TrayIcon | None = None
-
-def take_screenshots() -> list[str]:
-    with mss() as sct:
-        return list(
-            sct.save(output=str(SHOTS_DIR / "{date:%Y-%m-%d %H-%M-%S}-{mon}.png"))
-        )
-
 
 def truncate_text(text: str) -> str:
     if len(text) < 50:
@@ -51,7 +44,7 @@ def on_tray_message_clicked() -> None:
 
 def ankihotkey_callback(context: AnkiHotkey) -> None:
     contents = get_selected_text()
-    screenshot_paths = take_screenshots()
+    screenshot_paths = take_screenshots(SHOTS_DIR)
     screenshot_names = [os.path.basename(path) for path in screenshot_paths]
     try:
         global current_nid
