@@ -9,12 +9,12 @@ description = "Helper for copying text to Anki"
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
-    "jaraco-clipboard>=3.1.0",
+    "jaraco-clipboard>=3.1.0; sys_platform != 'linux'",
     "jeepney>=0.9 ; sys_platform == 'linux'",
     "keyboard>=0.13.5; sys_platform != 'linux'",
     "mss>=10.1.0",
-    "pyautogui>=0.9.54",
-    "pyperclip>=1.11.0",
+    "pyautogui>=0.9.54; sys_platform != 'linux'",
+    "pyperclip>=1.11.0; sys_platform != 'linux'",
     "pyqt6>=6.10.2",
 ]
 

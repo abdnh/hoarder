@@ -4,11 +4,8 @@ import html
 import os
 import re
 import sys
-import time
 from pathlib import Path
 
-import pyautogui
-from jaraco import clipboard
 from mss import mss
 from PyQt6.QtWidgets import QApplication, QMainWindow, QSystemTrayIcon
 
@@ -16,6 +13,7 @@ from hoarder import cache
 from hoarder.ankiconnect import AnkiConnectionFailed, add_note, gui_browse
 from hoarder.config import AnkiHotkey, read_config
 from hoarder.hotkeys import Hotkey, HotkeyBackend, create_backend
+from hoarder.selection import get_selected_text
 
 # from tooltip import Tooltip
 from hoarder.tray import TrayIcon
@@ -28,12 +26,6 @@ def take_screenshots() -> list[str]:
         return list(
             sct.save(output=str(SHOTS_DIR / "{date:%Y-%m-%d %H-%M-%S}-{mon}.png"))
         )
-
-
-def trigger_copy() -> None:
-    # Wait for the hotkey that triggered us to finish
-    time.sleep(0.5)
-    pyautogui.hotkey("ctrl", "c")
 
 
 def truncate_text(text: str) -> str:
@@ -58,11 +50,7 @@ def on_tray_message_clicked() -> None:
 
 
 def ankihotkey_callback(context: AnkiHotkey) -> None:
-    trigger_copy()
-    try:
-        contents = clipboard.paste_html()
-    except:
-        contents = clipboard.paste_text()
+    contents = get_selected_text()
     screenshot_paths = take_screenshots()
     screenshot_names = [os.path.basename(path) for path in screenshot_paths]
     try:
